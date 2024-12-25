@@ -10,7 +10,7 @@
   tasks:
     - name: Check Cluster Component Status
       uri:
-        url: "{{ api_url }}/apis/cluster.k8s.io/v1beta1/nodes"
+        url: "{{ api_url }}/api/v1/nodes"
         method: GET
         headers:
           Authorization: "Bearer {{ api_token }}"
