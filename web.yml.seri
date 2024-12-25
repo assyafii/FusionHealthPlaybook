@@ -1,9 +1,9 @@
 ---
-- name: Check website status in parallel
+- name: Check website status
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Check status of websites in parallel
+    - name: Check status of websites
       uri:
         url: "{{ item }}"
         return_content: no
@@ -32,22 +32,9 @@
         - https://paypal.com
         - https://examplexxxx.com
         - https://exampleyyyy.com
-      async: 45
-      poll: 0
       ignore_errors: yes
 
-    - name: Wait for all website checks to complete
-      async_status:
-        jid: "{{ item.ansible_job_id }}"
-      register: job_result
-      until: job_result.finished
-      retries: 2
-      delay: 5
-      with_items: "{{ result.results }}"
-      ignore_errors: yes
-
-    - name: Display website statuses
+    - name: Display website status
       debug:
-        msg: "URL={{ item.item.url }} Code={{ item.result.status if item.result is defined else 'N/A' }} Status={{ item.result.msg if item.result is defined else 'N/A' }}"
-      with_items: "{{ job_result.results }}"
-
+        msg: "URL={{ item.item }} Code={{ item.status }} Status={{ item.msg }}"
+      with_items: "{{ result.results }}"
