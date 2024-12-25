@@ -36,7 +36,5 @@
 
     - name: Display website status
       debug:
-        url: "URL={{ item.item }}"
-        code: "{{ item.status }}"
-        description: "{ item.msg }}"
+        msg: "URL={{ item.item }} Code={{ item.status }} Status={{ item.msg }}"
       with_items: "{{ result.results }}"
