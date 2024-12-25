@@ -1,46 +1,37 @@
 ---
-- name: Test URL status
+- name: Check website status
   hosts: localhost
+  gather_facts: no
   tasks:
-    - name: Set url details
-      set_fact:
-        test_urls:
-          - "https://google.com"
-          - "https://yahoo.com"
-          - "https://bing.com"
-          - "https://github.com"
-          - "https://twitter.com"
-          - "https://facebook.com"
-          - "https://amazon.com"
-          - "https://wikipedia.org"
-          - "https://reddit.com"
-          - "https://linkedin.com"
-          - "https://instagram.com"
-          - "https://stackoverflow.com"
-          - "https://apple.com"
-          - "https://microsoft.com"
-          - "https://python.org"
-          - "https://youtube.com"
-          - "https://wordpress.org"
-          - "https://npmjs.com"
-          - "https://gitlab.com"
-          - "https://dev.to"
-          - "https://example1.com"
-          - "https://example2.com"
-
-    - name: "Check the status of each URL from localhost"
+    - name: Check status of websites
       uri:
         url: "{{ item }}"
-        method: GET
-        timeout: 5  # Timeout set to 5 seconds
-        return_content: yes
-      register: out
-      with_items: "{{ test_urls }}"
-      ignore_errors: yes  # Continue even if the URL check fails
-      failed_when: false  # Prevent the task from failing
+        return_content: no
+        status_code: 200,301,302,404,500
+      register: result
+      with_items:
+        - http://google.com
+        - http://facebook.com
+        - http://twitter.com
+        - http://linkedin.com
+        - http://github.com
+        - http://stackoverflow.com
+        - http://reddit.com
+        - http://amazon.com
+        - http://apple.com
+        - http://microsoft.com
+        - http://netflix.com
+        - http://yahoo.com
+        - http://bing.com
+        - http://instagram.com
+        - http://wikipedia.org
+        - http://quora.com
+        - http://pinterest.com
+        - http://tumblr.com
+        - http://ebay.com
+        - http://paypal.com
 
-    - name: Print the status of each URL
+    - name: Display website status
       debug:
-        msg: "URL: {{ item }} - Status: {{ out.results[ansible_loop.index0].status | default('Failed') }}"
-      with_items: "{{ test_urls }}"
-
+        msg: "URL: {{ item.item }}, Code: {{ item.status }}, Status: {{ item.msg }}"
+      with_items: "{{ result.results }}"
