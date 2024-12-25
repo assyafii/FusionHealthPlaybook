@@ -30,22 +30,15 @@
         - https://instagram.com
         - https://paypal.com
         - https://yahoo.com
+        - https://failedxxxxx.com
+        - https://failedyyyyy.com
       register: website_status
       async: 30   # Run each task for 30 seconds
       poll: 0     # Do not wait for the task to finish immediately
 
-    - name: Wait for all website checks to finish
-      async_status:
-        jid: "{{ item.ansible_job_id }}"
-      loop: "{{ website_status.results }}"
-      register: result
-      until: result.finished
-      retries: 2    # Retry 2 times
-      delay: 3      # Wait 3 seconds between each retry
-
-    - name: Output simplified website status
+    - name: Output website status
       debug:
-        msg: "URL: {{ item.result.url }} - Status: {{ item.result.status }} - Code: {{ item.result.status_code }}"
+        msg: "{{ item.result.url }} - Status: {{ item.result.status }}"
       loop: "{{ result.results }}"
       when: item.result.status is defined
 
