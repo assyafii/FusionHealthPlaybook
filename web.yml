@@ -30,6 +30,8 @@
         - http://tumblr.com
         - http://ebay.com
         - http://paypal.com
+        - http://example1.com
+        - http://example2.com
 
     - name: Display website status
       debug:
