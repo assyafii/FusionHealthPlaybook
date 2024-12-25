@@ -41,8 +41,6 @@
         jid: "{{ item.ansible_job_id }}"
       register: job_result
       until: job_result.finished
-      retries: 2
-      delay: 5
       with_items: "{{ result.results }}"
       ignore_errors: yes
 
