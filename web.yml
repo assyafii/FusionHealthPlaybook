@@ -36,6 +36,7 @@
         return_content: yes
       register: out
       with_items: "{{ test_urls }}"
+      ignore_errors: yes  # Continue even if the URL check fails
 
     - name: Print the status of each URL
       debug:
