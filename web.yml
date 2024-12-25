@@ -11,26 +11,21 @@
         status_code: 200
       register: result
       with_items:
+        - http://google.com
+        - http://facebook.com
+        - http://twitter.com
+        - http://youtube.com
+        - http://amazon.com
+        - http://microsoft.com
+        - http://apple.com
+        - http://github.com
+        - http://wikipedia.org
+        - http://reddit.com
+        - http://stackoverflow.com
+        - http://linkedin.com
+        - http://bing.com
+        - http://yahoo.com
         - http://example1.com
-        - http://example2.com
-        - http://example3.com
-        - http://example4.com
-        - http://example5.com
-        - http://example6.com
-        - http://example7.com
-        - http://example8.com
-        - http://example9.com
-        - http://example10.com
-        - http://example11.com
-        - http://example12.com
-        - http://example13.com
-        - http://example14.com
-        - http://example15.com
-        - http://example16.com
-        - http://example17.com
-        - http://example18.com
-        - http://example19.com
-        - http://example20.com
       async: 60
       poll: 0
 
@@ -40,12 +35,11 @@
       register: job_result
       with_items: "{{ result.results }}"
       until: job_result.finished
-      retries: 5
+      retries: 2
       delay: 5
 
     - name: Display the results of the web status check
       debug:
-        msg: "Web status for {{ item.item }}: {{ item.status }}"
+        msg: "URL={{ item.item }}, Status={{ item.status | ternary('Success', 'Failed') }}, Code={{ item.status }}"
       with_items: "{{ result.results }}"
-      when: item.status == 200
 
