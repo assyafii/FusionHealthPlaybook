@@ -1,53 +1,44 @@
 ---
-- name: Check Website Status in Parallel
+- name: Test URL status
   hosts: localhost
-  gather_facts: no
   tasks:
-    - name: Ping websites in parallel
+    - name: Set url details
+      set_fact:
+        test_urls:
+          - "https://google.com"
+          - "https://yahoo.com"
+          - "https://bing.com"
+          - "https://github.com"
+          - "https://twitter.com"
+          - "https://facebook.com"
+          - "https://amazon.com"
+          - "https://wikipedia.org"
+          - "https://reddit.com"
+          - "https://linkedin.com"
+          - "https://instagram.com"
+          - "https://stackoverflow.com"
+          - "https://apple.com"
+          - "https://microsoft.com"
+          - "https://python.org"
+          - "https://youtube.com"
+          - "https://wordpress.org"
+          - "https://npmjs.com"
+          - "https://gitlab.com"
+          - "https://dev.to"
+          - "https://example1.com"
+          - "https://example2.com"
+
+    - name: "Check the status of each URL from localhost"
       uri:
         url: "{{ item }}"
         method: GET
-        return_content: no
-        status_code: 200
-      loop:
-        - https://google.com
-        - https://luthfi.dev
-        - https://facebook.com
-        - https://youtube.com
-        - https://twitter.com
-        - https://github.com
-        - https://linkedin.com
-        - https://reddit.com
-        - https://amazon.com
-        - https://wikipedia.org
-        - https://bbc.com
-        - https://cnn.com
-        - https://nytimes.com
-        - https://stackoverflow.com
-        - https://bing.com
-        - https://microsoft.com
-        - https://apple.com
-        - https://instagram.com
-        - https://paypal.com
-        - https://yahoo.com
-        - https://failedxxxxx.com
-        - https://failedyyyyy.com
-      register: website_status
-      async: 30   # Run each task for 30 seconds
-      poll: 0     # Do not wait for the task to finish immediately
+        timeout: 5  # Timeout set to 5 seconds
+        return_content: yes
+      register: out
+      with_items: "{{ test_urls }}"
 
-    - name: Wait for all website checks to finish
-      async_status:
-        jid: "{{ item.ansible_job_id }}"
-      loop: "{{ website_status.results }}"
-      register: result
-      until: result.finished
-      retries: 2    # Retry 2 times
-      delay: 5      # Wait 3 seconds between each retry
-
-    - name: Output website status
+    - name: Print the status of each URL
       debug:
-        msg: "URL:{{ item.result.url }} Status:{{ item.result.status }}"
-      loop: "{{ result.results }}"
-      when: item.result.status is defined
+        msg: "URL: {{ item }} - Status: {{ out.results[ansible_loop.index0].status }}"
+      with_items: "{{ test_urls }}"
 
