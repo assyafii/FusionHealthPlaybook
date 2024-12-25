@@ -1,3 +1,4 @@
+
 ---
 - name: Check website status in parallel
   hosts: localhost
@@ -41,13 +42,13 @@
         jid: "{{ item.ansible_job_id }}"
       register: job_result
       until: job_result.finished
-      retries: 3
-      delay: 5
+      retries: 5
+      delay: 3
       with_items: "{{ result.results }}"
       ignore_errors: yes
 
     - name: Display website statuses
       debug:
-        msg: "URL={{ item.item }} Code={{ item.status }} Status={{ item.msg }}"
+        msg: "URL={{ result.results.item }} Code={{ result.results.status }} Status={{ result.results.msg }}"
       with_items: "{{ job_result.results }}"
 
