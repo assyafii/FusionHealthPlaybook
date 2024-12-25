@@ -1,46 +1,53 @@
 ---
-- name: Check web status of multiple websites
+- name: Check Website Status in Parallel
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Check the status of the websites in parallel
+    - name: Ping websites in parallel
       uri:
         url: "{{ item }}"
         method: GET
         return_content: no
         status_code: 200
-      register: result
-      with_items:
-        - http://google.com
-        - http://facebook.com
-        - http://twitter.com
-        - http://youtube.com
-        - http://amazon.com
-        - http://microsoft.com
-        - http://apple.com
-        - http://github.com
-        - http://wikipedia.org
-        - http://reddit.com
-        - http://stackoverflow.com
-        - http://linkedin.com
-        - http://bing.com
-        - http://yahoo.com
-        - http://example1.com
-        - http://example2.com
-      async: 60
-      poll: 0
+      loop:
+        - https://google.com
+        - https://luthfi.dev
+        - https://facebook.com
+        - https://youtube.com
+        - https://twitter.com
+        - https://github.com
+        - https://linkedin.com
+        - https://reddit.com
+        - https://amazon.com
+        - https://wikipedia.org
+        - https://bbc.com
+        - https://cnn.com
+        - https://nytimes.com
+        - https://stackoverflow.com
+        - https://bing.com
+        - https://microsoft.com
+        - https://apple.com
+        - https://instagram.com
+        - https://paypal.com
+        - https://yahoo.com
+        - https://failedxxxxx.com
+        - https://failedyyyyy.com
+      register: website_status
+      async: 30   # Run each task for 30 seconds
+      poll: 0     # Do not wait for the task to finish immediately
 
-    - name: Wait for all web checks to complete
+    - name: Wait for all website checks to finish
       async_status:
         jid: "{{ item.ansible_job_id }}"
-      register: job_result
-      with_items: "{{ result.results }}"
-      until: job_result.finished
-      retries: 2
-      delay: 3
+      loop: "{{ website_status.results }}"
+      register: result
+      until: result.finished
+      retries: 2    # Retry 2 times
+      delay: 5      # Wait 3 seconds between each retry
 
-    - name: Display the results of the web status check
+    - name: Output website status
       debug:
-        msg: "URL={{ item.item }}, Status={{ item.status | ternary('Success', 'Failed') }}, Code={{ item.status }}"
-      with_items: "{{ result.results }}"
+        msg: "URL:{{ item.result.url }} Status:{{ item.result.status }}"
+      loop: "{{ result.results }}"
+      when: item.result.status is defined
 
