@@ -41,6 +41,6 @@
 
     - name: Print the status of each URL
       debug:
-        msg: "URL: {{ item }} - Status: {{ out.results[ansible_loop.index0] | default({}) | json_query('status') }}"
+        msg: "URL: {{ item }} - Status: {{ out.results[ansible_loop.index0].status | default('Failed') }}"
       with_items: "{{ test_urls }}"
 
