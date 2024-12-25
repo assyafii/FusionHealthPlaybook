@@ -43,11 +43,11 @@
       until: job_result.finished
       retries: 3
       delay: 5
-      with_items: "{{ result.results }}"
+      with_items: "{{ result_results }}"
       ignore_errors: yes
 
     - name: Display website statuses
       debug:
-        msg: "URL={{ item.item }} Code={{ item.result.results.status }} Status={{ item.result.results.msg }}"
+        msg: "URL={{ item.item }} Code={{ item.result_results.status }} Status={{ item.result_results.msg }}"
       with_items: "{{ job_result.results }}"
 
