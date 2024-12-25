@@ -30,11 +30,10 @@
         - http://example1.com
       ignore_errors: yes  # Ignore errors to continue checking other URLs
 
-    - name: Process and store web status results
+    - name: Capture the status of all websites (successful and failed)
       set_fact:
-        web_status_results: "{{ web_status_results | default([]) + [{'url': item.item, 'status': (item.status | ternary('Success', 'Failed')), 'code': item.status}] }}"
+        web_status_results: "{{ web_status_results | default([]) + [{'url': item.item, 'status': (item.failed | ternary('Failed', 'Success')), 'code': (item.status | default('N/A'))}] }}"
       loop: "{{ result.results }}"
-      when: result is defined
 
     - name: Display the results of the web status check
       debug:
