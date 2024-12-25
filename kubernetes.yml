@@ -16,23 +16,9 @@
           Authorization: "Bearer {{ api_token }}"
         validate_certs: no
       register: cluster_status
-
     - name: Display Cluster Component Status
       debug:
         msg: "{{ cluster_status.json }}"
-
-    - name: Get Cluster Events (Only Errors)
-      uri:
-        url: "{{ api_url }}/api/v1/events?fieldSelector=type=Warning"
-        method: GET
-        headers:
-          Authorization: "Bearer {{ api_token }}"
-        validate_certs: no
-      register: cluster_events
-
-    - name: Display Cluster Events (Errors Only)
-      debug:
-        msg: "{{ cluster_events.json.items | list }}"
 
     - name: Get Persistent Volume Claims Status
       uri:
@@ -42,10 +28,9 @@
           Authorization: "Bearer {{ api_token }}"
         validate_certs: no
       register: pvc_status
-
     - name: Display Persistent Volume Claims Status
       debug:
-        msg: "{{ pvc_status.json.items | list }}"
+        msg: "{{ pvc_status.json.items }}"
 
     - name: Get Persistent Volumes Status
       uri:
@@ -55,10 +40,9 @@
           Authorization: "Bearer {{ api_token }}"
         validate_certs: no
       register: pv_status
-
     - name: Display Persistent Volumes Status
       debug:
-        msg: "{{ pv_status.json.items | list }}"
+        msg: "{{ pv_status.json.items }}"
 
     - name: Get Monitoring Components (Prometheus, Metrics Server)
       uri:
@@ -68,10 +52,9 @@
           Authorization: "Bearer {{ api_token }}"
         validate_certs: no
       register: monitoring_components
-
     - name: Display Monitoring Components
       debug:
-        msg: "{{ monitoring_components.json.items | list }}"
+        msg: "{{ monitoring_components.json.items }}"
 
     - name: Get Namespace Status
       uri:
@@ -81,8 +64,6 @@
           Authorization: "Bearer {{ api_token }}"
         validate_certs: no
       register: namespace_status
-
     - name: Display Namespace Status
       debug:
-        msg: "{{ namespace_status.json.items | list }}"
-
+        msg: "{{ namespace_status.json.items }}"
