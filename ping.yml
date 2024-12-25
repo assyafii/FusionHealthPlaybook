@@ -11,7 +11,7 @@
   tasks:
 
     - name: Ping external servers and collect statistics
-      command: ping -c 3 "{{ item }}"
+      command: /bin/ping -c 4 "{{ item }}"
       register: ping_result
       ignore_errors: yes
       loop: "{{ targets }}"
