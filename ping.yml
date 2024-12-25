@@ -1,4 +1,28 @@
-- hosts: all
+---
+- name: Ping external servers (google.com, etc.)
+  hosts: localhost
   gather_facts: false
+  vars:
+    targets:
+      - google.com
+      - example.com
+      - bing.com
+
   tasks:
-    - ping:
+
+    - name: Ping external servers and collect statistics
+      command: ping -c 3 "{{ item }}"
+      register: ping_result
+      ignore_errors: yes
+      loop: "{{ targets }}"
+
+    - name: Display ping results
+      debug:
+        msg: |
+          Target= {{ item }}
+          AVG= {{ ping_result.stdout | regex_search('avg=([0-9.]+)', '\\1') }} ms
+          MAX= {{ ping_result.stdout | regex_search('max=([0-9.]+)', '\\1') }} ms
+          LOSS= {{ ping_result.stdout | regex_search('([0-9]+)% packet loss', '\\1') }}%
+      when: ping_result.rc == 0
+      loop: "{{ targets }}"
+
