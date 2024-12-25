@@ -28,10 +28,16 @@
         - http://bing.com
         - http://yahoo.com
         - http://example1.com
+      ignore_errors: yes  # Ignore errors to continue checking other URLs
+
+    - name: Process and store web status results
+      set_fact:
+        web_status_results: "{{ web_status_results | default([]) + [{'url': item.item, 'status': (item.status | ternary('Success', 'Failed')), 'code': item.status}] }}"
+      loop: "{{ result.results }}"
+      when: result is defined
 
     - name: Display the results of the web status check
       debug:
-        msg: "URL={{ item.item }}, Status={{ item.status | ternary('Success', 'Failed') }}, Code={{ item.status }}"
-      loop: "{{ result.results }}"
-      when: result is defined
+        msg: "URL={{ item.url }}, Status={{ item.status }}, Code={{ item.code }}"
+      loop: "{{ web_status_results }}"
 
