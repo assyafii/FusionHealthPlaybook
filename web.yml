@@ -1,4 +1,3 @@
-
 ---
 - name: Check website status in parallel
   hosts: localhost
@@ -49,6 +48,6 @@
 
     - name: Display website statuses
       debug:
-        msg: "URL={{ result.results.item }} Code={{ result.results.status }} Status={{ result.results.msg }}"
+        msg: "URL={{ item.url }} Code={{ item.status }} Status={{ item.msg }}"
       with_items: "{{ job_result.results }}"
 
