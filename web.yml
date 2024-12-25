@@ -1,0 +1,41 @@
+---
+- name: Check Website Status
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Ping websites
+      uri:
+        url: "{{ item }}"
+        method: GET
+        return_content: no
+        status_code: 200
+      loop:
+        - https://google.com
+        - https://luthfi.dev
+        - https://facebook.com
+        - https://youtube.com
+        - https://twitter.com
+        - https://github.com
+        - https://linkedin.com
+        - https://reddit.com
+        - https://amazon.com
+        - https://wikipedia.org
+        - https://bbc.com
+        - https://cnn.com
+        - https://nytimes.com
+        - https://stackoverflow.com
+        - https://bing.com
+        - https://microsoft.com
+        - https://apple.com
+        - https://instagram.com
+        - https://paypal.com
+        - https://yahoo.com
+      register: website_status
+      ignore_errors: yes
+
+    - name: Output website status
+      debug:
+        msg: "{{ item.url }} - Status: {{ item.status }}"
+      loop: "{{ website_status.results }}"
+      when: item.status is defined
+
