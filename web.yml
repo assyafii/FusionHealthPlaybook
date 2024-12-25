@@ -41,13 +41,13 @@
         jid: "{{ item.ansible_job_id }}"
       register: job_result
       until: job_result.finished
-      retries: 5
-      delay: 3
+      retries: 5  # Wait for 5 retries only
+      delay: 3    # Wait 3 seconds between retries
       with_items: "{{ result.results }}"
       ignore_errors: yes
 
     - name: Display website statuses
       debug:
-        msg: "URL={{ item.item }} Code={{ item.result.status if item.result is defined else 'N/A' }} Status={{ item.result.msg if item.result is defined else 'N/A' }}"
+        msg: "URL={{ item.item.url }} Code={{ item.result.status if item.result is defined else 'N/A' }} Status={{ item.result.msg if item.result is defined else 'N/A' }}"
       with_items: "{{ job_result.results }}"
 
