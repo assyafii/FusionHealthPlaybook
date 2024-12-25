@@ -1,9 +1,9 @@
 ---
-- name: Check Website Status
+- name: Check Website Status in Parallel
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Ping websites
+    - name: Ping websites in parallel
       uri:
         url: "{{ item }}"
         method: GET
@@ -30,12 +30,24 @@
         - https://instagram.com
         - https://paypal.com
         - https://yahoo.com
+        - https://failedxxxxx.com
+        - https://failedyyyyy.com
       register: website_status
-      ignore_errors: yes
+      async: 30   # Run each task for 30 seconds
+      poll: 0     # Do not wait for the task to finish immediately
+
+    - name: Wait for all website checks to finish
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      loop: "{{ website_status.results }}"
+      register: result
+      until: result.finished
+      retries: 2    # Retry 2 times
+      delay: 5      # Wait 3 seconds between each retry
 
     - name: Output website status
       debug:
-        msg: "{{ item.url }} - Status: {{ item.status }}"
-      loop: "{{ website_status.results }}"
-      when: item.status is defined
+        msg: "{{ item.result.url }} - Status: {{ item.result.status }}"
+      loop: "{{ result.results }}"
+      when: item.result.status is defined
 
