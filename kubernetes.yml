@@ -66,4 +66,4 @@
       register: namespace_status
     - name: Display Namespace Status
       debug:
-        msg: "{{ namespace_status.json.items }}"
+        msg: "{{ namespace_status.json['items'] | default([]) }}"
