@@ -3,15 +3,13 @@
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Check the status of each website serially with retries
+    - name: Check the status of the websites in parallel
       uri:
         url: "{{ item }}"
         method: GET
         return_content: no
         status_code: 200
       register: result
-      retries: 2
-      delay: 5
       with_items:
         - http://google.com
         - http://facebook.com
@@ -28,15 +26,21 @@
         - http://bing.com
         - http://yahoo.com
         - http://example1.com
-      ignore_errors: yes  # Ignore errors to continue checking other URLs
+        - http://example2.com
+      async: 60
+      poll: 0
 
-    - name: Capture the status of all websites (successful and failed)
-      set_fact:
-        web_status_results: "{{ web_status_results | default([]) + [{'url': item.item, 'status': (item.failed | ternary('Failed', 'Success')), 'code': (item.status | default('N/A'))}] }}"
-      loop: "{{ result.results }}"
+    - name: Wait for all web checks to complete
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: job_result
+      with_items: "{{ result.results }}"
+      until: job_result.finished
+      retries: 2
+      delay: 3
 
     - name: Display the results of the web status check
       debug:
-        msg: "URL={{ item.url }}, Status={{ item.status }}, Code={{ item.code }}"
-      loop: "{{ web_status_results }}"
+        msg: "URL={{ item.item }}, Status={{ item.status | ternary('Success', 'Failed') }}, Code={{ item.status }}"
+      with_items: "{{ result.results }}"
 
