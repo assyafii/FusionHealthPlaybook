@@ -1,0 +1,214 @@
+---
+- name: Kubernetes Health Checks
+  hosts: localhost
+  gather_facts: false
+  vars:
+    # Set your Kubernetes API URL and token here
+    api_url: "https://<KUBERNETES_API_URL>"
+    api_token: "<YOUR_API_TOKEN>"
+    
+  tasks:
+    - name: Check Cluster Component Status
+      uri:
+        url: "{{ api_url }}/apis/cluster.k8s.io/v1beta1/nodes"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: cluster_status
+    - name: Display Cluster Component Status
+      debug:
+        msg: "{{ cluster_status.json }}"
+
+    - name: Get Cluster Events (Only Errors)
+      uri:
+        url: "{{ api_url }}/api/v1/events?fieldSelector=type=Warning"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: cluster_events
+    - name: Display Cluster Events (Errors Only)
+      debug:
+        msg: "{{ cluster_events.json.items }}"
+
+    - name: Get API Server Health
+      uri:
+        url: "{{ api_url }}/healthz"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: api_server_health
+    - name: Display API Server Health
+      debug:
+        msg: "{{ api_server_health.content }}"
+
+    - name: Get API Server Metrics
+      uri:
+        url: "{{ api_url }}/metrics"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: api_server_metrics
+    - name: Display API Server Metrics
+      debug:
+        msg: "{{ api_server_metrics.content }}"
+
+    - name: Get Node Status
+      uri:
+        url: "{{ api_url }}/api/v1/nodes"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: node_status
+    - name: Display Node Status
+      debug:
+        msg: "{{ node_status.json.items }}"
+
+    - name: Get Node Conditions (CPU/Memory Requests & Limits)
+      uri:
+        url: "{{ api_url }}/api/v1/nodes"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: node_conditions
+    - name: Display Node Conditions (CPU/Memory)
+      debug:
+        msg: "{{ node_conditions.json.items | selectattr('status.capacity.cpu', 'defined') | map(attribute='status.capacity') | list }}"
+
+    - name: Get Node Resource Usage
+      uri:
+        url: "{{ api_url }}/apis/metrics.k8s.io/v1beta1/nodes"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: node_resource_usage
+    - name: Display Node Resource Usage
+      debug:
+        msg: "{{ node_resource_usage.json.items }}"
+
+    - name: Get DNS Health
+      uri:
+        url: "{{ api_url }}/api/v1/namespaces/kube-system/pods"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: dns_health
+    - name: Display DNS Health
+      debug:
+        msg: "{{ dns_health.json.items | selectattr('metadata.name', 'search') | selectattr('status.phase', 'equalto', 'Running') | list }}"
+
+    - name: Get ETCD Health Check
+      uri:
+        url: "{{ api_url }}/healthz"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: etcd_health
+    - name: Display ETCD Health Check
+      debug:
+        msg: "{{ etcd_health.content }}"
+
+    - name: Get ETCD Metrics
+      uri:
+        url: "{{ api_url }}/metrics"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: etcd_metrics
+    - name: Display ETCD Metrics
+      debug:
+        msg: "{{ etcd_metrics.content }}"
+
+    - name: Get Scheduler Health
+      uri:
+        url: "{{ api_url }}/apis/healthz"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: scheduler_health
+    - name: Display Scheduler Health
+      debug:
+        msg: "{{ scheduler_health.content }}"
+
+    - name: Get Controller Manager Health
+      uri:
+        url: "{{ api_url }}/apis/healthz"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: controller_manager_health
+    - name: Display Controller Manager Health
+      debug:
+        msg: "{{ controller_manager_health.content }}"
+
+    - name: Get Leader Election Status
+      uri:
+        url: "{{ api_url }}/api/v1/namespaces/kube-system/pods"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: leader_election_status
+    - name: Display Leader Election Status
+      debug:
+        msg: "{{ leader_election_status.json.items | selectattr('metadata.name', 'search') | selectattr('status.phase', 'equalto', 'Running') | list }}"
+
+    - name: Get Persistent Volume Claims Status
+      uri:
+        url: "{{ api_url }}/api/v1/persistentvolumeclaims"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: pvc_status
+    - name: Display Persistent Volume Claims Status
+      debug:
+        msg: "{{ pvc_status.json.items }}"
+
+    - name: Get Persistent Volumes Status
+      uri:
+        url: "{{ api_url }}/api/v1/persistentvolumes"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: pv_status
+    - name: Display Persistent Volumes Status
+      debug:
+        msg: "{{ pv_status.json.items }}"
+
+    - name: Get Monitoring Components (Prometheus, Metrics Server)
+      uri:
+        url: "{{ api_url }}/api/v1/namespaces/monitoring/pods"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: monitoring_components
+    - name: Display Monitoring Components
+      debug:
+        msg: "{{ monitoring_components.json.items }}"
+
+    - name: Get Namespace Status
+      uri:
+        url: "{{ api_url }}/api/v1/namespaces"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ api_token }}"
+        validate_certs: no
+      register: namespace_status
+    - name: Display Namespace Status
+      debug:
+        msg: "{{ namespace_status.json.items }}"
+
