@@ -1,42 +1,42 @@
 ---
-- name: Test URL status
+- name: Check web status of multiple websites
   hosts: localhost
+  gather_facts: no
   tasks:
-    - name: Set url details
-      set_fact:
-        test_urls:
-          - "https://google.com"
-          - "https://yahoo.com"
-          - "https://bing.com"
-          - "https://github.com"
-          - "https://twitter.com"
-          - "https://facebook.com"
-          - "https://amazon.com"
-          - "https://wikipedia.org"
-          - "https://reddit.com"
-          - "https://linkedin.com"
-          - "https://instagram.com"
-          - "https://stackoverflow.com"
-          - "https://apple.com"
-          - "https://microsoft.com"
-          - "https://python.org"
-          - "https://youtube.com"
-          - "https://wordpress.org"
-          - "https://npmjs.com"
-          - "https://gitlab.com"
-          - "https://dev.to"
-
-    - name: "Check the status of each URL from localhost"
+    - name: Check the status of each website serially with retries
       uri:
         url: "{{ item }}"
         method: GET
-        timeout: 5
-        return_content: yes
-      register: out
-      with_items: "{{ test_urls }}"
+        return_content: no
+        status_code: 200
+      register: result
+      retries: 2
+      delay: 5
+      with_items:
+        - http://google.com
+        - http://facebook.com
+        - http://twitter.com
+        - http://youtube.com
+        - http://amazon.com
+        - http://microsoft.com
+        - http://apple.com
+        - http://github.com
+        - http://wikipedia.org
+        - http://reddit.com
+        - http://stackoverflow.com
+        - http://linkedin.com
+        - http://bing.com
+        - http://yahoo.com
+        - http://example1.com
+      ignore_errors: yes  # Ignore errors to continue checking other URLs
 
-    - name: Print the status of each URL
+    - name: Capture the status of all websites (successful and failed)
+      set_fact:
+        web_status_results: "{{ web_status_results | default([]) + [{'url': item.item, 'status': (item.failed | ternary('Failed', 'Success')), 'code': (item.status | default('N/A'))}] }}"
+      loop: "{{ result.results }}"
+
+    - name: Display the results of the web status check
       debug:
-        msg: "URL: {{ item }} - Status: {{ out.results[ansible_loop.index0].status }}"
-      with_items: "{{ test_urls }}"
+        msg: "URL={{ item.url }}, Status={{ item.status }}, Code={{ item.code }}"
+      loop: "{{ web_status_results }}"
 
