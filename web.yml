@@ -48,6 +48,6 @@
 
     - name: Display website statuses
       debug:
-        msg: "URL={{ item.item }} Code={{ item.result.status }} Status={{ item.result.reason }}"
+        msg: "URL={{ item.item }} Code={{ item.result.results.status }} Status={{ item.result.results.msg }}"
       with_items: "{{ job_result.results }}"
 
