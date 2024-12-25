@@ -4,8 +4,8 @@
   gather_facts: false
   vars:
     # Set your Kubernetes API URL and token here
-    api_url: "https://<KUBERNETES_API_URL>"
-    api_token: "<YOUR_API_TOKEN>"
+    api_url: "https://10.96.0.1:443"
+    api_token: "eyJhbGciOiJSUzI1NiIsImtpZCI6IlltTlZTTXpLeEpmTi0xekpwdUxUQUgyLTlPUW5kMWRVMFN1d0cxajBOU1kifQ.eyJhdWQiOlsiaHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3ZjLmNsdXN0ZXIubG9jYWwiXSwiZXhwIjoxNzM1MjE3Njc5LCJpYXQiOjE3MzUxMzEyNzksImlzcyI6Imh0dHBzOi8va3ViZXJuZXRlcy5kZWZhdWx0LnN2Yy5jbHVzdGVyLmxvY2FsIiwianRpIjoiYmM2YmI0ZDItZjNlYi00YTYyLWEzODEtYjdiMTNiOTkxOTZmIiwia3ViZXJuZXRlcy5pbyI6eyJuYW1lc3BhY2UiOiJmdXNpb24iLCJzZXJ2aWNlYWNjb3VudCI6eyJuYW1lIjoiZnVzaW9uIiwidWlkIjoiNDAyM2YzMzYtNjM4Mi00ZmYwLWI0YmQtZDJkNmY1ZGI3YWI1In19LCJuYmYiOjE3MzUxMzEyNzksInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpmdXNpb246ZnVzaW9uIn0.MRM6Ocrixf-5U4jJieQ8oMzMcr78ssnyJS5cziXb5xLaSLlW8gUf54EqkpTViC7Vn604mDvDzDLlRZImVNJsFw-B7mY1ImQ6gxNlI-iVrpt-xX5uvOV1ZV1nKFP158bBnnO7T6csY4zJOYaUOCsvAM9KPujh6sKKnrBk4p8QJXnLGQzsps7gjZXnTNyBZmUZXs8nyWKBNLveYLxxGh9Y7MBHxbqTK80SUNbZDDuEbm3yXdlSslmseL5ysDW0-7J39rMW0qMXkhhqhNEYDCYe_p2P9IEdzm3sMBt9UUq9EEz6G7HO0dFy92sKJYDp4WunlHcHX23WED0RPHuwFtx70g"
     
   tasks:
     - name: Check Cluster Component Status
@@ -211,4 +211,3 @@
     - name: Display Namespace Status
       debug:
         msg: "{{ namespace_status.json.items }}"
-
