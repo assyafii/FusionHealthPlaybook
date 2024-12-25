@@ -18,7 +18,7 @@
       register: cluster_status
     - name: Display Cluster Component Status
       debug:
-        msg: "{{ cluster_status.json }}"
+        msg: "{{ cluster_status.json['items'] | default([]) }}"
 
     - name: Get Persistent Volume Claims Status
       uri:
@@ -30,7 +30,7 @@
       register: pvc_status
     - name: Display Persistent Volume Claims Status
       debug:
-        msg: "{{ pvc_status.json.items }}"
+        msg: "{{ pvc_status.json['items'] | default([]) }}"
 
     - name: Get Persistent Volumes Status
       uri:
@@ -42,7 +42,7 @@
       register: pv_status
     - name: Display Persistent Volumes Status
       debug:
-        msg: "{{ pv_status.json.items }}"
+        msg: "{{ pv_status.json['items'] | default([]) }}"
 
     - name: Get Monitoring Components (Prometheus, Metrics Server)
       uri:
@@ -54,7 +54,7 @@
       register: monitoring_components
     - name: Display Monitoring Components
       debug:
-        msg: "{{ monitoring_components.json.items }}"
+        msg: "{{ monitoring_components.json['items'] | default([]) }}"
 
     - name: Get Namespace Status
       uri:
